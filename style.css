@@ -1,0 +1,52 @@
+#map div {
+  width: auto;
+}
+#map {
+  height: 500px;
+  width: 80%;
+  margin-top: 32px;
+}
+#map,
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 600px;
+}
+#panel {
+  width: 200px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  float: right;
+  margin: 10px;
+}
+#color-palette {
+  clear: both;
+}
+.color-button {
+  width: 14px;
+  height: 14px;
+  font-size: 0;
+  margin: 2px;
+  float: left;
+  cursor: pointer;
+}
+#delete-button {
+  margin-top: 5px;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 400px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
