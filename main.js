@@ -4,9 +4,12 @@ var colors = ["#1E90FF", "#FF1493", "#32CD32", "#FF8C00", "#4B0082"];
 var selectedColor;
 var colorButtons = {};
 let infoWindow;
+var anotherArea;
+var occupiedPath;
+var map;
 
 function initialize() {
-  var map = new google.maps.Map(document.getElementById("map"), {
+  map = new google.maps.Map(document.getElementById("map"), {
     zoom: 10,
     center: new google.maps.LatLng(acheived_lat, acheived_lon),
     mapTypeId: "satellite",
@@ -87,7 +90,7 @@ function initialize() {
     { lat: 27.729736490857274, lng: 64.86356105664062 },
   ];
 
-  var anotherArea = new google.maps.Polygon({
+  anotherArea = new google.maps.Polygon({
     paths: temp2,
     strokeColor: "#0000FF",
     strokeOpacity: 0.8,
@@ -104,7 +107,7 @@ function initialize() {
   //   strokeWeight: 2,
   // });
 
-  const occupiedPath = new google.maps.Polygon({
+  occupiedPath = new google.maps.Polygon({
     paths: temp,
     strokeColor: "#FF0000",
     strokeOpacity: 0.8,
@@ -125,11 +128,11 @@ function initialize() {
   occupiedPath.setMap(map);
   anotherArea.setMap(map);
 
-  var geometryFactory = new jsts.geom.GeometryFactory();
-  var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
-  var anotherPolygon = createJstsPolygon(geometryFactory, anotherArea);
-  var intersection = occupiedPolygon.intersection(anotherPolygon);
-  drawIntersectionArea(map, intersection);
+  // var geometryFactory = new jsts.geom.GeometryFactory();
+  // var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
+  // var anotherPolygon = createJstsPolygon(geometryFactory, anotherArea);
+  // var intersection = occupiedPolygon.intersection(anotherPolygon);
+  // drawIntersectionArea(map, intersection);
 
   // occupiedPath2.setMap(map);
 
@@ -208,6 +211,7 @@ function initialize() {
         ) {
           var locations = e.overlay.getPath().getArray();
           console.log("POLY:" + locations.toString());
+          newPolygonIntersection();
           //alert(locations.toString() + " 1st instace");
         } else if (e.type == google.maps.drawing.OverlayType.CIRCLE) {
           console.log(
@@ -299,6 +303,16 @@ function deleteSelectedShape() {
   if (selectedShape) {
     selectedShape.setMap(null);
   }
+}
+
+function newPolygonIntersection(testVariable) {
+  console.log("Aoa na jani", testVariable);
+
+  var geometryFactory = new jsts.geom.GeometryFactory();
+  var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
+  var anotherPolygon = createJstsPolygon(geometryFactory, anotherArea);
+  var intersection = occupiedPolygon.intersection(anotherPolygon);
+  drawIntersectionArea(map, intersection);
 }
 
 function selectColor(color) {
