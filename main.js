@@ -7,6 +7,7 @@ let infoWindow;
 var anotherArea;
 var occupiedPath;
 var map;
+var intersectionArea;
 
 function initialize() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -90,14 +91,14 @@ function initialize() {
     { lat: 27.729736490857274, lng: 64.86356105664062 },
   ];
 
-  anotherArea = new google.maps.Polygon({
-    paths: temp2,
-    strokeColor: "#0000FF",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#0000FF",
-    fillOpacity: 0.35,
-  });
+  // anotherArea = new google.maps.Polygon({
+  //   paths: temp2,
+  //   strokeColor: "#0000FF",
+  //   strokeOpacity: 0.8,
+  //   strokeWeight: 2,
+  //   fillColor: "#0000FF",
+  //   fillOpacity: 0.35,
+  // });
 
   // const occupiedPath = new google.maps.Polyline({
   //   path: occupied,
@@ -126,7 +127,7 @@ function initialize() {
   // });
 
   occupiedPath.setMap(map);
-  anotherArea.setMap(map);
+  // anotherArea.setMap(map);
 
   // var geometryFactory = new jsts.geom.GeometryFactory();
   // var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
@@ -211,7 +212,7 @@ function initialize() {
         ) {
           var locations = e.overlay.getPath().getArray();
           console.log("POLY:" + locations.toString());
-          newPolygonIntersection();
+          newPolygonIntersection(e.overlay);
           //alert(locations.toString() + " 1st instace");
         } else if (e.type == google.maps.drawing.OverlayType.CIRCLE) {
           console.log(
@@ -259,12 +260,12 @@ function drawIntersectionArea(map, polygon) {
 
   console.log("coords: ", coords);
   if (coords.length) {
-    alert("Polygon intersects itself");
+    alert("Polygon intersects with Occupied Area");
   } else {
-    alert("Polygon does not intersect itself");
+    alert("Polygon does not intersect ");
   }
 
-  var intersectionArea = new google.maps.Polygon({
+  intersectionArea = new google.maps.Polygon({
     paths: coords,
     strokeColor: "#00FF00",
     strokeOpacity: 0.8,
@@ -302,15 +303,16 @@ function setSelection(shape) {
 function deleteSelectedShape() {
   if (selectedShape) {
     selectedShape.setMap(null);
+    intersectionArea.setMap(null);
   }
 }
 
-function newPolygonIntersection(testVariable) {
-  console.log("Aoa na jani", testVariable);
+function newPolygonIntersection(newPolygon) {
+  console.log("Aoa na jani", newPolygon);
 
   var geometryFactory = new jsts.geom.GeometryFactory();
   var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
-  var anotherPolygon = createJstsPolygon(geometryFactory, anotherArea);
+  var anotherPolygon = createJstsPolygon(geometryFactory, newPolygon);
   var intersection = occupiedPolygon.intersection(anotherPolygon);
   drawIntersectionArea(map, intersection);
 }
