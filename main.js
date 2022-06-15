@@ -17,38 +17,8 @@ function initialize() {
     disableDefaultUI: true,
     zoomControl: true,
   });
-
-  // var searchBox = new google.maps.places.SearchBox(
-  //   document.getElementById("pac-input")
-  // );
-  // map.controls[google.maps.ControlPosition.TOP_CENTER].push(
-  //   document.getElementById("pac-input")
-  // );
-  // google.maps.event.addListener(searchBox, "places_changed", function () {
-  //   searchBox.set("map", null);
-
-  //   var places = searchBox.getPlaces();
-
-  //   var bounds = new google.maps.LatLngBounds();
-  //   var i, place;
-  //   for (i = 0; (place = places[i]); i++) {
-  //     (function (place) {
-  //       var marker = new google.maps.Marker({
-  //         position: place.geometry.location,
-  //       });
-  //       marker.bindTo("map", searchBox, "map");
-  //       google.maps.event.addListener(marker, "map_changed", function () {
-  //         if (!this.getMap()) {
-  //           this.unbindAll();
-  //         }
-  //       });
-  //       bounds.extend(place.geometry.location);
-  //     })(place);
-  //   }
-  //   map.fitBounds(bounds);
-  //   searchBox.set("map", map);
-  //   map.setZoom(Math.min(map.getZoom(), 12));
-  // });
+  var input = document.getElementById("pac-input");
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
   const occupied = [
     { lat: 32.04423387410923, lng: 73.9169654822523 },
@@ -147,13 +117,18 @@ function initialize() {
   google.maps.event.addListener(occupiedPath, "click", function (event) {
     console.log("Hello", event);
     // var contentString = '<div id="content:">' + "Occupied Area" + '</div>';
+    var areaRight = google.maps.geometry.spherical.computeArea(
+      occupiedPath.getPath()
+    );
     var contentString =
       "<b>Occupied Area Polygon</b><br>" +
       "Clicked location: <br>" +
       event.latLng.lat() +
       "," +
       event.latLng.lng() +
-      "<br>";
+      "<br>" +
+      "Area Covered is: <br>" +
+      areaRight;
     var infowindow1 = new google.maps.InfoWindow();
     infowindow1.setContent(contentString);
     infowindow1.setPosition(event.latLng);
@@ -251,6 +226,61 @@ function initialize() {
   );
 
   buildColorPalette();
+
+  const searchBox = new google.maps.places.SearchBox(input);
+  map.addListener("bounds_changed", () => {
+    searchBox.setBounds(map.getBounds());
+  });
+  let markers = [];
+  searchBox.addListener("places_changed", () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+    // Clear out the old markers.
+    markers.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    // For each place, get the icon, name and location.
+    const bounds = new google.maps.LatLngBounds();
+
+    places.forEach((place) => {
+      if (!place.geometry || !place.geometry.location) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+
+      const icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25),
+      };
+
+      // Create a marker for each place.
+      markers.push(
+        new google.maps.Marker({
+          map,
+          icon,
+          title: place.name,
+          position: place.geometry.location,
+        })
+      );
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
 }
 
 function drawIntersectionArea(map, polygon) {
