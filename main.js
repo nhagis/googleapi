@@ -11,14 +11,92 @@ var intersectionArea;
 
 function initialize() {
   map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 10,
+    zoom: 18,
     center: new google.maps.LatLng(acheived_lat, acheived_lon),
-    mapTypeId: "satellite",
+    mapTypeId: "hybrid",
     disableDefaultUI: true,
     zoomControl: true,
   });
   var input = document.getElementById("pac-input");
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+  // let headers = new Headers();
+
+  // headers.append("Content-Type", "application/json");
+  // headers.append("Accept", "application/json");
+
+  // headers.append("Access-Control-Allow-Origin", "http://127.0.0.1:5501/");
+  // headers.append("Access-Control-Allow-Credentials", "true");
+
+  // headers.append("GET", "POST", "OPTIONS");
+
+  // const url = "https://jsonplaceholder.typicode.com/users";
+  // const url2 = "https://minerals.demo-portal.net/api/legacy";
+  // const url3 =
+  //   "https://cors-anywhere.herokuapp.com/https://minerals.demo-portal.net/api/legacy";
+
+  // fetch(url2)
+  //   .then((response) => {
+  //     if (!response.ok) {
+  //       throw new Error(`Error status: ${response.status}`);
+  //     }
+  //     return response.json();
+  //   })
+  //   .then((data) => {
+  //     console.log("Data is: ", data);
+  //   })
+  //   .catch((err) => console.log(err));
+
+  // fetch(url2, {
+  //   //mode: 'no-cors',
+  //   credentials: "include",
+  //   headers: headers,
+  // })
+  //   .then((response) => response.json())
+  //   .then((json) => console.log(json))
+  //   .catch((error) => console.log("Authorization failed : " + error.message));
+
+  // fetch(url2)
+  //   .then((response) => {
+  //     console.log(response);
+  //     return response.json();
+  //   })
+  //   .then((data) => {
+  //     console.log("Data is: ", data);
+  //   })
+  //   .catch(function (error) {
+  //     console.log("Error is", error.message);
+  //   });
+
+  // fetch(url2, { mode: "no-cors" })
+  //   .then(function (response) {
+  //     return response;
+  //   })
+  //   .then((data) => {
+  //     console.log(data);
+  //   })
+  //   .catch(function (error) {
+  //     console.log("Request failed", error);
+  //   });
+
+  // const uname = "asad@gmail.com";
+  // const pword = "password";
+
+  // fetch(url2, {
+  //   mode: "no-cors",
+  //   headers: {
+  //     Authorization: "Basic " + base64.encode(uname + ":" + pword),
+  //   },
+  // })
+  //   .then(function (response) {
+  //     return response;
+  //   })
+  //   .then((data) => {
+  //     console.log(data);
+  //   })
+  //   .catch(function (error) {
+  //     console.log("Request failed", error);
+  //   });
 
   const occupied = [
     { lat: 32.04423387410923, lng: 73.9169654822523 },
@@ -61,6 +139,21 @@ function initialize() {
     { lat: 27.729736490857274, lng: 64.86356105664062 },
   ];
 
+  const temp3 = [
+    { lat: 32.0437712066856, lng: 73.9171851551951 },
+    { lat: 32.0427435537231, lng: 73.9170993245067 },
+    { lat: 32.0426798934256, lng: 73.9178181565226 },
+    { lat: 32.0437348297865, lng: 73.9178610718669 },
+    { lat: 32.0437621124622, lng: 73.9181936657847 },
+    { lat: 32.0427071764157, lng: 73.9182794964732 },
+    { lat: 32.0427071764157, lng: 73.92018922929185 },
+    { lat: 32.043862148870005, lng: 73.92004975442308 },
+    { lat: 32.044280481754434, lng: 73.91953477029222 },
+    { lat: 32.04429867009734, lng: 73.9191163456859 },
+    { lat: 32.043925808345314, lng: 73.9191163456859 },
+    { lat: 32.04409859812655, lng: 73.91833314065354 },
+  ];
+
   // anotherArea = new google.maps.Polygon({
   //   paths: temp2,
   //   strokeColor: "#0000FF",
@@ -79,7 +172,8 @@ function initialize() {
   // });
 
   occupiedPath = new google.maps.Polygon({
-    paths: temp,
+    // paths: [temp, Gulistan, warezai],
+    paths: temp3,
     strokeColor: "#FF0000",
     strokeOpacity: 0.8,
     strokeWeight: 0,
@@ -187,6 +281,10 @@ function initialize() {
         ) {
           var locations = e.overlay.getPath().getArray();
           console.log("POLY:" + locations.toString());
+          var areaRight = google.maps.geometry.spherical.computeArea(
+            e.overlay.getPath()
+          );
+          console.log("Polygon Area Covered is:" + areaRight);
           newPolygonIntersection(e.overlay);
           //alert(locations.toString() + " 1st instace");
         } else if (e.type == google.maps.drawing.OverlayType.CIRCLE) {
@@ -338,7 +436,7 @@ function deleteSelectedShape() {
 }
 
 function newPolygonIntersection(newPolygon) {
-  console.log("Aoa na jani", newPolygon);
+  // console.log("New Polygon", newPolygon);
 
   var geometryFactory = new jsts.geom.GeometryFactory();
   var occupiedPolygon = createJstsPolygon(geometryFactory, occupiedPath);
